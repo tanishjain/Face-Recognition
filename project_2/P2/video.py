@@ -3,14 +3,14 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
 
-face_cascade = cv2.CascadeClassifier('../haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 # Read the input image
 #img = cv2.imread('test.png')
 #cap = cv2.VideoCapture('test.mp4')
 #cap = cv2.VideoCapture(0)
 
 camera = PiCamera()
-camera.resolution = (120, 160)
+camera.resolution = (640, 480)
 camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=camera.resolution)
 
