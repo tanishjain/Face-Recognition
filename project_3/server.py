@@ -20,13 +20,16 @@ import numpy as np
 from keras.models import load_model
 from flask import Flask, request, jsonify, abort, send_from_directory
 from flask_cors import CORS
+import base64
 
+print("before")
 app = Flask(__name__)
+print("i am here 0")
 CORS(app)                               # Allow CORS (Cross Origin Requests)
-
+print("i m here 1")
 # TODO: Load the model from the weights file.
 MODEL =  load_model("mymodel.h5")
-
+print("model loaded")
 
 def classify(path_to_image):
     """
@@ -55,7 +58,10 @@ def classify(path_to_image):
     # TODO: Use network to predict the 'image_to_be_classified' and
     # get an array of prediction values
     # Note: MODEL.predict() returns an array of arrays ie. [[classes]]
+    print("before model")
     predictions =  MODEL.predict(image_to_be_classified)
+    print("after model")
+
 
     # TODO: Get the predicted label which is defined as follows:
     # Label = the index of the largest value in the prediction array
@@ -117,7 +123,6 @@ def get_person(person):
     except ValueError as e:
         print("Exception: {}".format(e))
 
-    # Handle last person
     if(person == 'last'):
         index = -1
 
@@ -141,7 +146,7 @@ def get_person(person):
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     """Receives an image, classifies the image, and responds with the label."""
-
+    print("In predict")
     image = None
 
     # This extracts the image data from the request
@@ -157,22 +162,27 @@ def predict():
     starter = image.find(',')
     image_data = image[starter+1:]
 
+
     # Path where the image will be saved
     temp_image_name = 'temp.jpg'
 
     # Decodes the image data and saves the image to disk
     with open(temp_image_name, 'wb') as fh:
-        fh.write(image_data.decode('base64'))
+        fh.write(base64.b64decode(image_data))
+    print("after decode")
 
     # TODO: Call classify to predict the image and save the result to a
     # variable called 'prediction'
     prediction = classify(temp_image_name)
+    print("after predict")
 
     # Add to persons list
     persons.append(prediction)
+    print("after person")
 
     # Converts python dictionary into JSON format
     prediction_json = jsonify(prediction)
+    print("after json")
 
     # Respond to the request (Send prediction back to Pi)
     return prediction_json
@@ -188,6 +198,7 @@ def main(args):
 
 
 if(__name__ == "__main__"):
+    print("in main")
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--port',
