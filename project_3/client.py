@@ -20,47 +20,40 @@ from picamera.array import PiRGBArray
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
 # TODO: Declare path to face cascade
-CASCADE_PATH = "../project_2/P2/haarcascade_frontalface_default.xml"
-
+CASCADE_PATH = "/home/pi/Desktop/Face-Recognition/project_2/P2/haarcascade_frontalface_default.xml"
 
 def request_from_server(img):
-    """
-    Sends image to server for classification.
-
-    :param img: Image array to be classified.
-    :returns: Returns a dictionary containing label and cofidence.
-    """
     # URL or PUBLIC DNS to your server
-    URL = "ec2-54-185-33-46.us-west-2.compute.amazonaws.com"
-
+    URL = "http://ec2-35-164-225-216.us-west-2.compute.amazonaws.com:8080/predict"
+    print("i'm here - 0")
     # File name so that it can be temporarily stored.
     temp_image_name = 'temp.jpg'
 
     # TODO: Save image with name stored in 'temp_image_name'
-    cv2.imwrite(img, temp_image_name)
+    cv2.imwrite(temp_image_name, img)
 
     # Reopen image and encode in base64
     # Open binary file in read mode
     image = open(temp_image_name, 'rb')
     image_read = image.read()
     image_64_encode = base64.encodestring(image_read)
-
+    print("i'm here - 1")
     # Defining a params dict for the parameters to be sent to the API
     payload = {'image': image_64_encode}
-
+    print("i'm here - 2")
     # Sending post request and saving the response as response object
     response = requests.post(url=URL, json=payload)
-
+    print("i'm here - 3")
     # Get prediction from response
     prediction = response.json()
-
+    print("returning prediction")
     return prediction
 
 
 def main():
     # 1. Start running the camera.
     # TODO: Initialize face detector
-    face_cascade = cv2.CascadeClassifier(CASECASE_PATH)
+    face_cascade = cv2.CascadeClassifier(CASCADE_PATH)
 
     # Initialize camera and update parameters
     camera = PiCamera()
@@ -71,9 +64,9 @@ def main():
     rawCapture = PiRGBArray(camera, size=(width, height))
 
     # Warm up camera
-    print 'Let me get ready ... 2 seconds ...'
+    print ('Let me get ready ... 2 seconds ...')
     time.sleep(2)
-    print 'Starting ...'
+    print ('Starting ...')
 
     # 2. Detect a face, display it, and get confirmation from user.
     for frame in camera.capture_continuous(
@@ -98,9 +91,10 @@ def main():
             # Keep showing image until a key is pressed
             cv2.waitKey()
             answer = input('Confirm image (1-yes / 0-no): ')
+            print(answer)
             print('==================================')
-
-            if(answer == 1):
+            
+            if(answer):
                 print('Let\'s see who you are...')
 
                 # TODO: Get label and confidence using request_from_server
